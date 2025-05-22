@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PQC Analysis - README</title>
+  <title>PQC Geometry & Topology Analysis</title>
 
   <!-- Prism.js for syntax highlighting -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
   <!-- Open Graph for social sharing -->
-  <meta property="og:title" content="PQC Analysis - README" />
+  <meta property="og:title" content="PQC Geometry & Topology Analysis" />
   <meta property="og:description" content="Analyze geometric and topological features of PQCs using PennyLane and Ripser." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://github.com/yourusername/pqc_analysis" />
@@ -19,9 +19,9 @@
     :root {
       --bg-color: #f4f4f4;
       --text-color: #333;
-      --header-color: #0056b3;
+      --header-color: #1a237e;
       --code-bg: #e9e9e9;
-      --pre-bg: #eee;
+      --pre-bg: #f8f8f8;
     }
 
     body.dark-mode {
@@ -33,16 +33,16 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       line-height: 1.6;
       background-color: var(--bg-color);
       color: var(--text-color);
-      max-width: 900px;
+      max-width: 960px;
       margin: 20px auto;
       padding: 0 20px;
     }
 
-    h1, h2, h3 {
+    h1, h2, h3, h4 {
       color: var(--header-color);
     }
 
@@ -61,18 +61,18 @@
       background-color: var(--code-bg);
       padding: 2px 4px;
       border-radius: 3px;
-      font-family: "Courier New", Courier, monospace;
+      font-family: monospace;
     }
 
     pre {
       background-color: var(--pre-bg);
       padding: 10px;
+      border-left: 4px solid #ccc;
       border-radius: 5px;
       overflow-x: auto;
     }
 
     ul {
-      list-style-type: disc;
       margin-left: 20px;
     }
 
@@ -118,16 +118,15 @@
   <div class="container">
     <button class="dark-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
-    <h1>PQC Analysis</h1>
+    <h1>PQC Geometry & Topology Analysis</h1>
 
-    <p>This repository provides Python code for analyzing the geometric and topological properties of Parameterized Quantum Circuits (PQCs) using PennyLane, PyTorch, and Ripser.</p>
+    <p>This project provides tools for analyzing the <strong>geometric</strong> and <strong>topological</strong> properties of Parameterized Quantum Circuits (PQCs) using <code>PennyLane</code>, <code>PyTorch</code>, and <code>Ripser</code>.</p>
 
     <h2>Table of Contents</h2>
     <div id="toc">
       <ul>
         <li><a href="#installation">Installation</a></li>
-        <li><a href="#package-structure">Package Structure</a></li>
-        <li><a href="#usage">Usage</a></li>
+        <li><a href="#usage">Quick Usage</a></li>
         <li><a href="#geometry-analysis">Geometry Analysis</a></li>
         <li><a href="#topology-analysis">Topology Analysis</a></li>
         <li><a href="#contributing">Contributing</a></li>
@@ -136,60 +135,62 @@
     </div>
 
     <h2 id="installation">Installation</h2>
-    <p>Install the required libraries using pip:</p>
+    <p>Install dependencies with:</p>
     <pre><code class="language-bash">pip install pennylane pennylane-lightning[torch] torch numpy tqdm tabulate ripser</code></pre>
 
-    <h2 id="package-structure">Package Structure</h2>
-    <ul>
-      <li><code>geometry_analysis.py</code>: Compute Fubini-Study metric tensor and related metrics.</li>
-      <li><code>topology_analysis.py</code>: Perform topological data analysis using persistent homology.</li>
-    </ul>
-
-    <h2 id="usage">Usage</h2>
-
-    <h3 id="geometry-analysis">Geometry Analysis</h3>
-    <p><code>pqc_geometry_analysis</code> analyzes Fubini-Study metric tensor of a PQC.</p>
+    <h2 id="usage">Quick Usage</h2>
+    <p>Import and call the analysis functions with your PQC.</p>
 
     <pre><code class="language-python">from pqc_analysis.geometry_analysis import pqc_geometry_analysis
+from pqc_analysis.topology_analysis import pqc_topology_analysis</code></pre>
 
-def my_pqc(params):
-    qml.RX(params[0], wires=0)
-    qml.RZ(params[1], wires=0)
-    qml.RX(params[2], wires=1)
-    qml.RZ(params[3], wires=1)
-    return qml.state()
+    <h2 id="geometry-analysis">Geometry Analysis</h2>
 
-summary = pqc_geometry_analysis(
+    <p><code>pqc_geometry_analysis</code> evaluates the expressibility of PQCs using the Fubini-Study metric tensor.</p>
+
+    <pre><code class="language-python">summary = pqc_geometry_analysis(
     pqc=my_pqc,
     n_params=4,
     n_qubits=2,
     n_samples=500,
     init_strategy='uniform'
-)
-print(summary)</code></pre>
+)</code></pre>
 
-    <h3 id="topology-analysis">Topology Analysis</h3>
-    <p><code>pqc_topology_analysis</code> infers topological features using persistent homology.</p>
+    <h4>Function Signature:</h4>
+    <pre><code class="language-python">pqc_geometry_analysis(pqc, n_params, n_qubits, n_samples=100, init_strategy='uniform', init_thetas=None, **kwargs)</code></pre>
 
-    <pre><code class="language-python">from pqc_analysis.topology_analysis import pqc_topology_analysis
+    <h4>Returns:</h4>
+    <ul>
+      <li><code>Total Volume</code>: Reachable state space volume</li>
+      <li><code>Avg Local Volume</code>: Determinant of the metric tensor</li>
+      <li><code>Avg Metric Rank</code>: Rank of the metric matrix</li>
+      <li><code>Redundant Param Ratio</code>: % of rank-deficient parameterizations</li>
+      <li><code>Avg Gamma</code>: Condition number (inverse eigenvalue spread)</li>
+    </ul>
 
-def my_pqc_topology(params):
-    qml.RX(params[0], wires=0)
-    qml.RZ(params[1], wires=0)
-    qml.CNOT(wires=[0, 1])
-    return qml.state()
+    <h2 id="topology-analysis">Topology Analysis</h2>
 
-entropy_values = pqc_topology_analysis(
+    <p><code>pqc_topology_analysis</code> estimates persistent homology from sampled PQC outputs.</p>
+
+    <pre><code class="language-python">entropy_values = pqc_topology_analysis(
     pqc=my_pqc_topology,
     n_params=2,
     n_qubits=2,
     n_samples=200,
     max_dim=1
-)
-print(entropy_values)</code></pre>
+)</code></pre>
+
+    <h4>Function Signature:</h4>
+    <pre><code class="language-python">pqc_topology_analysis(pqc, n_params, n_qubits, n_samples=100, max_dim=2, init_strategy='normal', init_thetas=None, **kwargs)</code></pre>
+
+    <h4>Returns:</h4>
+    <ul>
+      <li>List of Shannon entropy values for each dimension H₀, H₁, ..., Hₖ</li>
+      <li>Higher entropy = more topological complexity</li>
+    </ul>
 
     <h2 id="contributing">Contributing</h2>
-    <p>Contributions are welcome. Please open an issue or pull request on GitHub.</p>
+    <p>We welcome contributions! Fork the repository, submit pull requests, or open an issue.</p>
 
     <h2 id="license">License</h2>
     <p>MIT License</p>
