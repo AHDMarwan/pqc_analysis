@@ -10,7 +10,7 @@ It provides tools for:
 
 ## Installation
 
-Install via pip (once published) or clone this repo and install locally:
+Installation :
 
 ```bash
 pip install git+https://github.com/AHDMarwan/pqc_analysis.git --quiet.
