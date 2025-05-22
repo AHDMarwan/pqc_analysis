@@ -13,6 +13,4 @@ It provides tools for:
 Install via pip (once published) or clone this repo and install locally:
 
 ```bash
-git clone https://github.com/AHDMarwan/pqc_analysis
-cd pqc_analysis
-pip install .
+pip install git+https://github.com/AHDMarwan/pqc_analysis.git --quiet.
