@@ -1,0 +1,6 @@
+numpy
+torch
+pennylane
+tqdm
+tabulate
+ripser
