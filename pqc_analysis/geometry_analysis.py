@@ -125,18 +125,15 @@ def pqc_geometry_analysis(pqc, n_params, n_qubits, n_samples=100,
         "Singular Metric Ratio": singular_count / n_samples,
     }
 
-    print("
---- PQC Geometry Analysis Summary ---")
+    print("--- PQC Geometry Analysis Summary ---")
     print(tabulate(summary.items(), headers=["Metric", "Value"], tablefmt="fancy_grid"))
-    print("
-Interpretation Notes:")
+    print("Interpretation Notes:")
     print("- 'Mean Quantum Volume': Expressibility measure of PQC state manifold volume.")
     print("- 'Avg Metric Rank': Effective number of independent parameters.")
     print("- 'Redundant Param Ratio': Fraction of samples with redundant parameters (rank < n_params).")
     print("- 'Avg Gamma (Cond # Inv)': Trainability proxy, higher values indicate less barren plateaus.")
     print("- 'Singular Metric Ratio': Fraction of samples with singular metric tensors (potential barren plateaus).")
-    print("
-Suggestion: Compare these metrics across PQC designs to evaluate architecture quality.")
+    print("Suggestion: Compare these metrics across PQC designs to evaluate architecture quality.")
 
     return summary
 
