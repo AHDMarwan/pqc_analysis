@@ -115,7 +115,7 @@ def pqc_geometry_analysis(pqc_circuit_fn, n_params, n_qubits, n_samples=500,
     # --- QNode and Device Definition (as per your working code) ---
     # The device and QNode are defined internally in this function.
     dev_type = "default.mixed" if noisy else "default.qubit"
-    # Use n_qubits + 1 wires as per your working setup
+    
     dev = qml.device(dev_type, wires=n_qubits + 1) 
 
     # The QNode is created from the user-provided circuit function
@@ -234,9 +234,6 @@ def pqc_geometry_analysis(pqc_circuit_fn, n_params, n_qubits, n_samples=500,
 
         avg_metrics = {
             # Note: The mean quantum volume is currently the average of local volume densities.
-            # Your original code applies a normalization: * (2 * np.pi) ** n_params
-            # I will keep this for consistency with your provided working reference,
-            # but usually, the direct mean of volumes is the average local density.
             'Mean Quantum Volume': np.mean(volumes) * (2 * np.pi) ** n_params, 
             'Mean Log Quantum Volume': mean_log_volume,
             'Avg Metric Rank': np.mean(ranks),
