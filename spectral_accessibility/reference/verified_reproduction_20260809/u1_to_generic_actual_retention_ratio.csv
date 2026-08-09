@@ -1,0 +1,7 @@
+profile,n,depth_factor,parameter_distribution,measurement_basis,bitflip_rate,tangent_prefix,k,metric,u1_circuits,generic_circuits,ratio,ci95_low,ci95_high
+reproduce,6,6.0,uniform_pi,computational,0.0,48,1,actual_retention,12,18,5.98688852015007,5.680677048979086,6.30067959203215
+reproduce,6,6.0,uniform_pi,computational,0.0,48,2,actual_retention,12,18,2.6400003018566744,2.5769226950931006,2.7050187056605455
+reproduce,8,6.0,uniform_pi,computational,0.0,48,1,actual_retention,12,18,14.66885891787293,13.927928826630389,15.45474898843147
+reproduce,8,6.0,uniform_pi,computational,0.0,48,2,actual_retention,12,18,5.399173636703896,5.293018382201072,5.508195148132288
+reproduce,10,6.0,uniform_pi,computational,0.0,48,1,actual_retention,12,18,38.911719297861254,37.25958289262501,40.72297405380654
+reproduce,10,6.0,uniform_pi,computational,0.0,48,2,actual_retention,12,18,12.19665180101657,11.967873385751018,12.409969832087398

@@ -1,0 +1,52 @@
+name: Spectral accessibility CI
+
+on:
+  push:
+    paths:
+      - 'spectral_accessibility/**'
+      - '.github/workflows/spectral-accessibility-ci.yml'
+  pull_request:
+    paths:
+      - 'spectral_accessibility/**'
+      - '.github/workflows/spectral-accessibility-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: spectral_accessibility
+    env:
+      PYTHONHASHSEED: '0'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: spectral_accessibility/requirements-lock.txt
+      - run: python -m pip install -r requirements-lock.txt
+      - run: python -m pip install -e . --no-deps
+      - run: pytest
+      - run: qaccess controls --output ci_results/controls
+      - name: Smoke simulation
+        run: |
+          qaccess run-task \
+            --profile smoke --family SU2-CNOT-line --n 4 --depth-factor 1 \
+            --instance-start 0 --instance-stop 1 --tangents 8 \
+            --parameter-distribution uniform_pi --output ci_results/shard
+          qaccess analyze --input ci_results --output ci_results/final
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: spectral-accessibility-ci
+          path: spectral_accessibility/ci_results
+          retention-days: 30
