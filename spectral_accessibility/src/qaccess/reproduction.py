@@ -9,7 +9,7 @@ def compare_reproduction(
     observed_path: Path,
     reference_path: Path,
     *,
-    mean_tolerance: float = 0.006,
+    mean_tolerance: float = 0.0006,
 ) -> pd.DataFrame:
     obs = pd.read_csv(observed_path)
     ref = pd.read_csv(reference_path)
@@ -22,5 +22,5 @@ def compare_reproduction(
         & (merged.abs_error_Ffull_over_FQ <= mean_tolerance)
     )
     merged["deff_relative_error"] = merged.abs_error_deff / merged.deff_reported
-    merged["deff_matches"] = merged.deff_relative_error <= 0.05
+    merged["deff_matches"] = merged.deff_relative_error <= 0.001
     return merged
