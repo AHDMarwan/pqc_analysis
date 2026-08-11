@@ -4,7 +4,7 @@ from .adapters import (
     pennylane_barren_plateau_scan,
     qiskit_barren_plateau_scan,
 )
-from .diagnostics import analyze
+from .diagnostics import DiagnosticFinding, analyze, diagnose
 from .geometry import (
     compute_metric_tensor,
     condition_score,
@@ -21,6 +21,8 @@ from .topology_analysis import pqc_topology_analysis
 
 __all__ = [
     "analyze",
+    "diagnose",
+    "DiagnosticFinding",
     "compute_metric_tensor",
     "metric_spectrum",
     "metric_rank",
