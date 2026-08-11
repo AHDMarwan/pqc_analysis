@@ -91,8 +91,8 @@ def run_topology_diagnostic_study(
             )
 
             theta_topology = sample_parameters(
-                topology_samples,
                 spec.n_params,
+                topology_samples,
                 strategy=init_strategy,
                 seed=seed + 1_000_003,
             )
