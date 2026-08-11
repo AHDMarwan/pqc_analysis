@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: "PQC Analysis"
+message: "If you use PQC Analysis in research, please cite this software."
+type: software
+authors:
+  - family-names: "AIT HADDOU"
+    given-names: "Marwan"
+version: 0.2.0
+date-released: 2026-08-11
+repository-code: "https://github.com/AHDMarwan/pqc_analysis"
+license: MIT
+keywords:
+  - quantum machine learning
+  - parameterized quantum circuits
+  - trainability
+  - quantum geometry
+  - barren plateaus
+  - persistent homology
