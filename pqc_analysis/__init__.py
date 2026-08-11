@@ -1,4 +1,9 @@
-from .adapters import make_pennylane_gradient_fn, pennylane_barren_plateau_scan
+from .adapters import (
+    make_pennylane_gradient_fn,
+    make_qiskit_gradient_fn,
+    pennylane_barren_plateau_scan,
+    qiskit_barren_plateau_scan,
+)
 from .diagnostics import analyze
 from .geometry import (
     compute_metric_tensor,
@@ -27,6 +32,8 @@ __all__ = [
     "barren_plateau_scan",
     "make_pennylane_gradient_fn",
     "pennylane_barren_plateau_scan",
+    "make_qiskit_gradient_fn",
+    "qiskit_barren_plateau_scan",
     "pqc_geometry_analysis",
     "pqc_topology_analysis",
 ]
