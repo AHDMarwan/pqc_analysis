@@ -11,10 +11,12 @@ PQC Analysis provides:
 - **Quantum geometry** using the Fubini–Study metric tensor
 - **Metric spectrum diagnostics**: rank, conditioning, effective dimension, and parameter redundancy
 - **Gradient trainability statistics**: mean absolute gradient, variance, norm, and near-zero fraction
-- **Barren-plateau scaling scans** based on the scaling of gradient variance with system size
+- **Barren-plateau scaling scans** based on gradient-variance scaling with system size
+- **Transparent diagnostic recommendations** with configurable thresholds
 - **Topological data analysis (TDA)** via persistent homology and Bures distances
 - A unified `analyze(...)` API for PennyLane-compatible circuits
-- Backend-independent trainability statistics, with a PennyLane gradient adapter included
+- Backend-independent trainability statistics
+- PennyLane and optional Qiskit gradient adapters
 
 The v0.1 functions remain available for backward compatibility.
 
@@ -31,9 +33,14 @@ For development:
 ```bash
 git clone https://github.com/AHDMarwan/pqc_analysis.git
 cd pqc_analysis
-python -m pip install -e .
-python -m pip install pytest
+python -m pip install -e ".[dev]"
 python -m pytest -q tests
+```
+
+For Qiskit support:
+
+```bash
+python -m pip install -e ".[qiskit]"
 ```
 
 ## 1. Unified geometry analysis
@@ -68,7 +75,7 @@ report = pqa.analyze(
 print(report.summary())
 ```
 
-The structured result can also be inspected programmatically:
+Structured fields are available directly:
 
 ```python
 report.geometry.metric_rank
@@ -78,7 +85,20 @@ report.geometry.effective_dimension
 report.geometry.metadata
 ```
 
-## 2. Gradient statistics
+## 2. Diagnostic recommendations
+
+Recommendations are explicit heuristics with configurable thresholds, not hidden model-generated judgments.
+
+```python
+for finding in pqa.diagnose(report):
+    print(finding.severity, finding.code)
+    print(finding.message)
+    print(finding.suggestion)
+```
+
+Current diagnostics screen for high parameter redundancy, poor metric conditioning, low metric-rank fraction, and a large fraction of near-zero gradients. A single-circuit gradient diagnostic is never labelled a barren plateau; use a scaling scan for that question.
+
+## 3. Gradient statistics
 
 The statistical layer is backend-independent. Supply any callable that maps a parameter vector to a gradient vector:
 
@@ -92,7 +112,7 @@ print(stats.gradient_variance)
 print(stats.near_zero_fraction)
 ```
 
-For scalar PennyLane cost circuits, a gradient adapter is provided:
+For scalar PennyLane cost circuits:
 
 ```python
 import pennylane as qml
@@ -112,9 +132,9 @@ def cost_circuit(theta):
 gradient_fn = pqa.make_pennylane_gradient_fn(cost_circuit, n_qubits)
 ```
 
-## 3. Barren-plateau scaling diagnostics
+## 4. Barren-plateau scaling diagnostics
 
-A barren plateau is fundamentally a scaling phenomenon. Rather than classifying a single small gradient as a barren plateau, PQC Analysis scans several system sizes and fits
+A barren plateau is fundamentally a scaling phenomenon. Rather than classifying one small gradient as a barren plateau, PQC Analysis scans several system sizes and fits
 
 ```text
 log(Var[gradient]) = a * n_qubits + b
@@ -129,10 +149,8 @@ import pqc_analysis as pqa
 
 def circuit_factory(n_qubits):
     def cost(theta):
-        index = 0
         for wire in range(n_qubits):
-            qml.RY(theta[index], wires=wire)
-            index += 1
+            qml.RY(theta[wire], wires=wire)
         for wire in range(n_qubits - 1):
             qml.CNOT(wires=[wire, wire + 1])
         return qml.expval(qml.PauliZ(0))
@@ -152,17 +170,34 @@ print(scan.log_variance_slope)
 print(scan.r_squared)
 ```
 
-The boolean property
+`scan.shows_exponential_suppression` is a configurable heuristic based on the fitted decay rate and `R^2`. Report it together with the raw scaling data.
+
+## 5. Qiskit adapter
+
+Qiskit support is optional and reuses the same backend-independent trainability layer. The adapter uses Qiskit Algorithms' estimator-gradient interface.
 
 ```python
-scan.shows_exponential_suppression
+from qiskit import QuantumCircuit
+from qiskit.circuit import ParameterVector
+from qiskit.quantum_info import SparsePauliOp
+import pqc_analysis as pqa
+
+params = ParameterVector("theta", 4)
+qc = QuantumCircuit(4)
+for i in range(4):
+    qc.ry(params[i], i)
+for i in range(3):
+    qc.cx(i, i + 1)
+
+observable = SparsePauliOp.from_list([("ZIII", 1.0)])
+gradient_fn = pqa.make_qiskit_gradient_fn(qc, observable)
 ```
 
-is a configurable heuristic based on the fitted decay rate and `R^2`; it should be reported together with the raw scaling data, not used as a standalone scientific conclusion.
+A Qiskit scaling scan is also available through `pqa.qiskit_barren_plateau_scan(...)`. A custom EstimatorV2-compatible backend can be supplied when moving beyond local statevector analysis.
 
-## 4. Geometry primitives
+## 6. Geometry primitives
 
-The lower-level API is also public:
+The lower-level API is public:
 
 ```python
 pqa.compute_metric_tensor(qnode, theta, approximation="block-diag")
@@ -173,9 +208,9 @@ pqa.effective_dimension(metric)
 pqa.redundant_parameter_ratio(metric)
 ```
 
-`compute_metric_tensor` supports `"full"`, `"block-diag"`, and `"diag"` approximations.
+`compute_metric_tensor` supports `"full"`, `"block-diag"`, and `"diag"` approximations. `analyze(...)` allocates an auxiliary device wire when the full metric requires it.
 
-## 5. Topological analysis
+## 7. Topological analysis
 
 The original TDA functionality remains available:
 
@@ -183,23 +218,32 @@ The original TDA functionality remains available:
 from pqc_analysis import pqc_topology_analysis
 ```
 
-It uses density matrices, pairwise Bures distances, persistent homology (`ripser`), and persistence entropy to characterize the topology of sampled PQC state spaces.
+It uses density matrices, pairwise Bures distances, persistent homology (`ripser`), and persistence entropy to characterize sampled PQC state spaces.
+
+## Examples
+
+Runnable examples are provided in:
+
+```text
+examples/basic_analysis.py
+examples/barren_plateau_scan.py
+```
 
 ## Project direction
 
-The next development milestones are:
+Next milestones:
 
-1. richer trainability diagnostics and per-parameter gradient spectra
-2. automated geometry/trainability recommendations
-3. standardized architecture benchmarking
-4. Qiskit adapters without changing the statistical core
-5. shot-aware and hardware-aware diagnostics
+1. standardized architecture benchmarking and experiment tables
+2. richer per-parameter gradient spectra and layer-wise diagnostics
+3. geometry-aware parameter pruning experiments
+4. shot-aware and hardware-aware resource diagnostics
+5. reproducible benchmark suites across PennyLane and Qiskit
 
 The goal is for PQC Analysis to become an **analysis layer above quantum programming frameworks**, rather than another circuit-construction framework.
 
 ## Scientific use
 
-For research results, always report numerical settings such as parameter initialization, number of samples, observable, circuit family, system sizes, metric approximation, differentiation method, random seed, and any heuristic thresholds. Trainability conclusions are architecture- and problem-dependent.
+For research results, always report parameter initialization, sample count, observable, circuit family, system sizes, metric approximation, differentiation method, random seed, and heuristic thresholds. Trainability conclusions are architecture- and problem-dependent.
 
 ## License
 
