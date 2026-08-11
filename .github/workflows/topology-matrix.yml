@@ -1,0 +1,44 @@
+name: Topology Benchmark Matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Experiment profile
+        required: true
+        default: pilot
+        type: choice
+        options:
+          - pilot
+          - full
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install experimental TDA stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[tda]"
+
+      - name: Run topology benchmark matrix
+        run: python scripts/run_topology_matrix.py --profile "${{ inputs.profile }}" --output artifacts/topology_matrix
+
+      - name: Upload experiment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: topology-matrix-${{ inputs.profile }}-${{ github.sha }}
+          path: artifacts/topology_matrix
+          if-no-files-found: error
+          retention-days: 30
