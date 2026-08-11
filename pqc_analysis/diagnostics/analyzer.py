@@ -81,6 +81,8 @@ def analyze(
         raise ValueError("n_qubits must be positive")
     if n_params <= 0:
         raise ValueError("n_params must be positive")
+    if metric_approximation not in {"full", "block-diag", "diag"}:
+        raise ValueError("metric_approximation must be 'full', 'block-diag', or 'diag'")
 
     if parameter_samples is None:
         parameter_samples = sample_parameters(n_params, samples, strategy=init_strategy, seed=seed)
@@ -89,7 +91,9 @@ def analyze(
         if parameter_samples.ndim != 2 or parameter_samples.shape[1] != n_params:
             raise ValueError("parameter_samples must have shape (n_samples, n_params)")
 
-    device = qml.device(device_name, wires=n_qubits)
+    # PennyLane's full metric tensor may use a Hadamard-test auxiliary wire.
+    device_wires = n_qubits + 1 if metric_approximation == "full" else n_qubits
+    device = qml.device(device_name, wires=device_wires)
     qnode = qml.QNode(circuit, device, interface="autograd", diff_method="best")
 
     geometry = _geometry_summary(qnode, parameter_samples, metric_approximation, tol)
