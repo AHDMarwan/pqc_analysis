@@ -4,6 +4,7 @@ from .adapters import (
     pennylane_barren_plateau_scan,
     qiskit_barren_plateau_scan,
 )
+from .benchmarking import BenchmarkResult, PQCSpec, benchmark
 from .diagnostics import DiagnosticFinding, analyze, diagnose
 from .geometry import (
     compute_metric_tensor,
@@ -48,6 +49,9 @@ __all__ = [
     "analyze",
     "diagnose",
     "DiagnosticFinding",
+    "PQCSpec",
+    "BenchmarkResult",
+    "benchmark",
     "compute_metric_tensor",
     "metric_spectrum",
     "metric_rank",
