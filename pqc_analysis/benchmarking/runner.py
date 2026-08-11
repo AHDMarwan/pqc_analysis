@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
 
 import numpy as np
 
 from ..core.result import AnalysisReport
 from ..diagnostics.analyzer import analyze
+from ..resources import estimate_gradient_resources
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,8 @@ class PQCSpec:
     n_qubits: int
     n_params: int
     gradient_fn: Optional[Callable[[np.ndarray], np.ndarray]] = None
+    gradient_method: Optional[str] = None
+    shots_per_circuit: Optional[int] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -23,6 +26,8 @@ class PQCSpec:
             raise ValueError("name must be non-empty")
         if self.n_qubits <= 0 or self.n_params <= 0:
             raise ValueError("n_qubits and n_params must be positive")
+        if self.shots_per_circuit is not None and self.shots_per_circuit <= 0:
+            raise ValueError("shots_per_circuit must be positive when provided")
 
 
 @dataclass(frozen=True)
@@ -73,11 +78,7 @@ class BenchmarkResult:
         return records
 
     def aggregate(self) -> Dict[str, Dict[str, float]]:
-        """Aggregate numeric metrics by architecture using mean and std.
-
-        Returned keys use ``<metric>_mean`` and ``<metric>_std`` so the output
-        can be serialized without depending on pandas.
-        """
+        """Aggregate numeric metrics by architecture using mean and std."""
         records = self.to_records()
         grouped: Dict[str, List[Dict[str, Any]]] = {}
         for row in records:
@@ -134,6 +135,19 @@ def benchmark(
 
     runs: List[BenchmarkRun] = []
     for spec in specs_list:
+        resource_metadata: Dict[str, Any] = {}
+        if spec.gradient_method is not None:
+            resources = estimate_gradient_resources(
+                spec.n_params,
+                gradient_method=spec.gradient_method,
+                shots_per_circuit=spec.shots_per_circuit,
+            )
+            resource_metadata = {
+                "gradient_method": resources.gradient_method,
+                "circuit_evaluations_per_step": resources.circuit_evaluations_per_step,
+                "shots_per_step": resources.shots_per_step,
+            }
+
         for seed in seed_list:
             report = analyze(
                 spec.circuit,
@@ -153,7 +167,7 @@ def benchmark(
                     spec_name=spec.name,
                     seed=seed,
                     report=report,
-                    metadata=dict(spec.metadata),
+                    metadata={**dict(spec.metadata), **resource_metadata},
                 )
             )
 
