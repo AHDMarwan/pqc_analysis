@@ -15,9 +15,34 @@ from .geometry import (
 )
 from .trainability import BarrenPlateauScanResult, barren_plateau_scan, gradient_statistics
 
-# Backward-compatible public API from v0.1.
-from .geometry_analysis import pqc_geometry_analysis
-from .topology_analysis import pqc_topology_analysis
+
+def pqc_geometry_analysis(*args, **kwargs):
+    """Backward-compatible v0.1 geometry entry point.
+
+    Legacy dependencies are imported only when this function is called so the
+    v0.2 core remains lightweight.
+    """
+    try:
+        from .geometry_analysis import pqc_geometry_analysis as legacy_geometry_analysis
+    except ImportError as exc:
+        raise ImportError(
+            "The legacy geometry API requires optional dependencies. "
+            "Install pqc_analysis with the 'legacy' extra."
+        ) from exc
+    return legacy_geometry_analysis(*args, **kwargs)
+
+
+def pqc_topology_analysis(*args, **kwargs):
+    """Backward-compatible v0.1 topology entry point with lazy dependencies."""
+    try:
+        from .topology_analysis import pqc_topology_analysis as legacy_topology_analysis
+    except ImportError as exc:
+        raise ImportError(
+            "Topological analysis requires optional dependencies. "
+            "Install pqc_analysis with the 'tda' extra."
+        ) from exc
+    return legacy_topology_analysis(*args, **kwargs)
+
 
 __all__ = [
     "analyze",
