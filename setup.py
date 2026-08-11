@@ -22,6 +22,10 @@ setup(
         "scipy",
         "matplotlib",
     ],
+    extras_require={
+        "qiskit": ["qiskit", "qiskit-algorithms"],
+        "dev": ["pytest"],
+    },
     python_requires=">=3.11",
     classifiers=[
         "Programming Language :: Python :: 3",
