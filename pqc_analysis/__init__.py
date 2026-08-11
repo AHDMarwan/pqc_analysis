@@ -1,3 +1,4 @@
+from .adapters import make_pennylane_gradient_fn, pennylane_barren_plateau_scan
 from .diagnostics import analyze
 from .geometry import (
     compute_metric_tensor,
@@ -7,7 +8,7 @@ from .geometry import (
     metric_spectrum,
     redundant_parameter_ratio,
 )
-from .trainability import gradient_statistics
+from .trainability import BarrenPlateauScanResult, barren_plateau_scan, gradient_statistics
 
 # Backward-compatible public API from v0.1.
 from .geometry_analysis import pqc_geometry_analysis
@@ -22,6 +23,10 @@ __all__ = [
     "effective_dimension",
     "redundant_parameter_ratio",
     "gradient_statistics",
+    "BarrenPlateauScanResult",
+    "barren_plateau_scan",
+    "make_pennylane_gradient_fn",
+    "pennylane_barren_plateau_scan",
     "pqc_geometry_analysis",
     "pqc_topology_analysis",
 ]
