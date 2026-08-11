@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
-
-import numpy as np
+from typing import Dict, Iterable, List, Sequence
 
 from .benchmark_matrix import BenchmarkMatrixCase, BenchmarkMatrixConfig, build_benchmark_matrix, matrix_to_study_specs
 from .study import TopologyStudyResult, run_topology_diagnostic_study
@@ -53,18 +51,25 @@ class MatrixExperimentResult:
         return output
 
     def correlation_records(self) -> List[Dict[str, object]]:
+        """Return only topology-vs-diagnostic pairs as flat CSV-friendly rows."""
+        topology_metrics = tuple(self.correlations.metadata.get("topology_metrics", ()))
+        diagnostic_metrics = tuple(self.correlations.metadata.get("diagnostic_metrics", ()))
+        method = str(self.correlations.metadata.get("method", "unknown"))
+
         rows: List[Dict[str, object]] = []
-        for pair in self.correlations.pairs:
-            rows.append(
-                {
-                    "topology_metric": pair.topology_metric,
-                    "diagnostic_metric": pair.diagnostic_metric,
-                    "correlation": pair.correlation,
-                    "p_value": pair.p_value,
-                    "n": pair.n,
-                    "method": self.correlations.method,
-                }
-            )
+        for topology_metric in topology_metrics:
+            for diagnostic_metric in diagnostic_metrics:
+                pair = self.correlations.pair(topology_metric, diagnostic_metric)
+                rows.append(
+                    {
+                        "topology_metric": topology_metric,
+                        "diagnostic_metric": diagnostic_metric,
+                        "correlation": pair["correlation"],
+                        "p_value": pair["p_value"],
+                        "n": self.correlations.sample_size,
+                        "method": method,
+                    }
+                )
         return rows
 
 
