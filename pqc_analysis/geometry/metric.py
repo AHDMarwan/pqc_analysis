@@ -1,12 +1,8 @@
-from typing import Literal
-
 import numpy as np
 import pennylane as qml
 
-MetricApproximation = Literal["full", "block-diag", "diag"]
 
-
-def compute_metric_tensor(qnode, theta, approximation: MetricApproximation = "block-diag") -> np.ndarray:
+def compute_metric_tensor(qnode, theta, approximation="block-diag") -> np.ndarray:
     """Compute the Fubini-Study metric tensor for a PennyLane QNode.
 
     The approximation is explicit instead of hard-coded so analysis code can
