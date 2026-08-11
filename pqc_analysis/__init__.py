@@ -7,14 +7,24 @@ from .adapters import (
 from .benchmarking import BenchmarkResult, PQCSpec, benchmark
 from .diagnostics import DiagnosticFinding, analyze, diagnose
 from .geometry import (
+    PruningPlan,
+    aggregate_pruning_plan,
     compute_metric_tensor,
     condition_score,
     effective_dimension,
+    geometry_pruning_plan,
     metric_rank,
     metric_spectrum,
     redundant_parameter_ratio,
 )
-from .trainability import BarrenPlateauScanResult, barren_plateau_scan, gradient_statistics
+from .resources import ResourceEstimate, estimate_gradient_resources, estimate_training_resources
+from .trainability import (
+    BarrenPlateauScanResult,
+    GradientProfile,
+    barren_plateau_scan,
+    gradient_profile,
+    gradient_statistics,
+)
 
 
 def pqc_geometry_analysis(*args, **kwargs):
@@ -58,9 +68,17 @@ __all__ = [
     "condition_score",
     "effective_dimension",
     "redundant_parameter_ratio",
+    "PruningPlan",
+    "geometry_pruning_plan",
+    "aggregate_pruning_plan",
     "gradient_statistics",
+    "GradientProfile",
+    "gradient_profile",
     "BarrenPlateauScanResult",
     "barren_plateau_scan",
+    "ResourceEstimate",
+    "estimate_gradient_resources",
+    "estimate_training_resources",
     "make_pennylane_gradient_fn",
     "pennylane_barren_plateau_scan",
     "make_qiskit_gradient_fn",
