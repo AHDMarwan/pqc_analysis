@@ -4,3 +4,6 @@ pennylane
 tqdm
 tabulate
 ripser
+persim
+scipy
+matplotlib

@@ -1,10 +1,10 @@
+from setuptools import find_packages, setup
 
-from setuptools import setup, find_packages
 
 setup(
     name="pqc_analysis",
-    version="0.1.0",
-    description="PQC analysis toolkit for quantum circuits: geometry and topology",
+    version="0.2.0",
+    description="Trainability, geometry, and topology diagnostics for parameterized quantum circuits",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="AIT HADDOU Marwan",
@@ -17,7 +17,10 @@ setup(
         "pennylane",
         "tqdm",
         "tabulate",
-        "ripser"
+        "ripser",
+        "persim",
+        "scipy",
+        "matplotlib",
     ],
     python_requires=">=3.7",
     classifiers=[
