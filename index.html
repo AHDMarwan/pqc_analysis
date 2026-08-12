@@ -1,118 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="PQC Analysis is a research-oriented toolkit for trainability, quantum geometry, pruning, benchmarking, resource accounting, and topology diagnostics of parameterized quantum circuits." />
-  <meta name="theme-color" content="#08111f" />
-  <meta property="og:title" content="PQC Analysis" />
-  <meta property="og:description" content="Trainability, geometry, pruning, benchmarking and resource diagnostics for parameterized quantum circuits." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://ahdmarwan.github.io/pqc_analysis/" />
-  <title>PQC Analysis — Trainability & Geometry Diagnostics for Quantum Circuits</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="PQC Analysis is a Python toolkit for geometric, trainability, resource, benchmarking, and experimental topological analysis of parameterized quantum circuits.">
+  <title>PQC Analysis</title>
   <style>
-    :root {
-      --bg:#07101d; --bg2:#0b1627; --panel:#0f1d31; --panel2:#12233b;
-      --text:#e9f0f8; --muted:#9fb0c4; --line:#243b57; --cyan:#56d9f5;
-      --blue:#6e8cff; --violet:#a87cff; --green:#62e6b1; --warn:#ffc86a;
-      --max:1180px; --radius:20px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:
-      radial-gradient(circle at 15% 0%,rgba(86,217,245,.11),transparent 28%),
-      radial-gradient(circle at 85% 7%,rgba(168,124,255,.12),transparent 24%),
-      linear-gradient(180deg,var(--bg),#091523 55%,#07101d);color:var(--text);line-height:1.6}
-    a{color:inherit;text-decoration:none}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
-    nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(16px);background:rgba(7,16,29,.78);border-bottom:1px solid rgba(255,255,255,.06)}
-    .nav-inner{height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{font-weight:800;letter-spacing:-.03em}.brand span{color:var(--cyan)}
-    .nav-links{display:flex;gap:22px;color:var(--muted);font-size:.94rem}.nav-links a:hover{color:var(--text)}
-    .nav-cta{padding:10px 15px;border:1px solid var(--line);border-radius:12px;background:#0c1a2c}
-    .hero{padding:96px 0 74px}.hero-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:64px;align-items:center}
-    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 11px;border:1px solid #294765;border-radius:999px;color:#b9d6e7;background:rgba(16,35,58,.65);font-size:.83rem}
-    h1{font-size:clamp(3rem,7vw,6.2rem);line-height:.94;letter-spacing:-.065em;margin:24px 0 24px;max-width:900px}
-    .gradient{background:linear-gradient(92deg,var(--cyan),var(--blue) 52%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .lead{max-width:760px;color:var(--muted);font-size:1.16rem}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-    .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:13px;font-weight:700;border:1px solid var(--line);background:#0c1a2b}.btn.primary{background:linear-gradient(135deg,#5ee0f7,#748cff);color:#06101e;border:none}.btn:hover{transform:translateY(-1px)}
-    .meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:28px;color:#8195aa;font-size:.9rem}.meta strong{color:#c8d5e3}
-    .quantum-card{position:relative;min-height:430px;border:1px solid #24415f;border-radius:28px;background:linear-gradient(145deg,rgba(18,36,60,.95),rgba(9,21,37,.95));box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden;padding:24px}
-    .quantum-card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(110,140,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(110,140,255,.06) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,black,transparent)}
-    .circuit{position:relative;margin-top:28px}.wire{height:64px;border-top:1px solid #35516e;position:relative}.q{position:absolute;left:0;top:-13px;color:#7f96ad;font:12px ui-monospace,monospace}
-    .gate{position:absolute;top:-20px;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font:700 12px ui-monospace,monospace;border:1px solid #496884;background:#102944}.g1{left:25%}.g2{left:48%;border-color:#6f6cb0;color:#d8caff}.g3{left:72%;border-color:#3a8a88;color:#bffaf3}
-    .metric-box{position:relative;margin-top:18px;padding:18px;border-radius:16px;background:rgba(4,13,24,.7);border:1px solid #203a55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:#9db6ca}
-    .metric-box b{color:var(--green)}.spark{display:flex;align-items:end;gap:5px;height:68px;margin-top:12px}.spark i{display:block;flex:1;background:linear-gradient(var(--cyan),#445ec8);border-radius:4px 4px 1px 1px;opacity:.8}
-    section{padding:84px 0}.section-head{max-width:760px;margin-bottom:34px}.kicker{color:var(--cyan);font-weight:750;letter-spacing:.08em;text-transform:uppercase;font-size:.77rem}.section-head h2{font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-.045em;line-height:1.05;margin:10px 0 14px}.section-head p{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(17,34,57,.9),rgba(10,23,39,.9))}.icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#102b45;border:1px solid #305374;color:var(--cyan);font-weight:800}.card h3{margin:18px 0 8px;font-size:1.07rem}.card p{margin:0;color:var(--muted);font-size:.93rem}
-    .split{display:grid;grid-template-columns:.9fr 1.1fr;gap:46px;align-items:start}.code{border:1px solid #243d59;background:#06111f;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.22)}.code-head{padding:12px 16px;border-bottom:1px solid #1e344c;color:#7f95ab;font-size:.8rem;display:flex;justify-content:space-between}.dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#38506a;margin-right:5px}.code pre{margin:0;padding:22px;overflow:auto;font:13px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8d6e6}.kw{color:#bd91ff}.fn{color:#66dbf3}.str{color:#78e0ae}.num{color:#ffcb78}
-    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.flow div{padding:18px 12px;text-align:center;border:1px solid var(--line);border-radius:14px;background:#0d1b2d;color:#b6c6d5;font-size:.87rem}.flow b{display:block;color:var(--text);margin-bottom:5px}
-    .research{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.research .card{min-height:180px}.tag{display:inline-block;margin-top:14px;padding:5px 9px;border-radius:999px;border:1px solid #2c4966;color:#92adc4;font-size:.76rem}
-    .install{padding:30px;border:1px solid #2a4766;border-radius:24px;background:linear-gradient(120deg,rgba(20,45,70,.8),rgba(24,24,57,.72))}.install-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.command{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#06111f;border:1px solid #263d56;border-radius:13px;padding:14px 16px;font:13px ui-monospace,monospace;color:#bde9f5;overflow:auto}.command button{border:0;background:transparent;color:#829bb2;cursor:pointer}
-    footer{border-top:1px solid rgba(255,255,255,.07);padding:34px 0 48px;color:#8195aa}.footer-grid{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.footer-links{display:flex;gap:18px}
-    @media(max-width:900px){.hero-grid,.split,.install-grid{grid-template-columns:1fr}.quantum-card{min-height:380px}.grid{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr 1fr}.nav-links{display:none}}
-    @media(max-width:620px){.wrap{width:min(100% - 24px,var(--max))}.hero{padding-top:70px}.grid,.research{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.actions .btn{width:100%;justify-content:center}h1{font-size:3.25rem}}
+    :root{--bg:#fafafa;--surface:#fff;--text:#202124;--muted:#62666c;--line:#e1e4e8;--accent:#345f8c;--code:#f4f5f6;--max:920px}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif} a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto} header{background:var(--surface);border-bottom:1px solid var(--line)} nav{min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:650;color:var(--text)}.links{display:flex;gap:16px;font-size:.92rem}.intro{padding:64px 0 52px}h1{font-size:clamp(2.5rem,7vw,4.4rem);line-height:1.05;letter-spacing:-.04em;margin:0 0 16px}.lead{max-width:760px;color:var(--muted);font-size:1.08rem}.meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:22px;color:var(--muted);font-size:.9rem}main{padding:18px 0 70px}section{padding:40px 0;border-bottom:1px solid var(--line)}section:last-child{border-bottom:0}h2{font-size:1.55rem;margin:0 0 14px;letter-spacing:-.02em}h3{font-size:1rem;margin:0 0 6px}.muted,.item p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}.item{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:17px}.item p{margin:0;font-size:.94rem}pre{overflow:auto;background:var(--code);border:1px solid var(--line);border-radius:7px;padding:16px;font-size:.86rem;line-height:1.6}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.note{margin-top:16px;padding:10px 14px;border-left:3px solid #9ca7b2;background:#f3f4f5;color:var(--muted)}footer{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--muted);font-size:.9rem}@media(max-width:700px){.links{display:none}.grid{grid-template-columns:1fr}.intro{padding-top:48px}}
   </style>
 </head>
 <body>
-<nav><div class="wrap nav-inner"><a class="brand" href="#top">PQC<span>Analysis</span></a><div class="nav-links"><a href="#features">Features</a><a href="#workflow">Workflow</a><a href="#research">Research</a><a href="#install">Install</a></div><a class="nav-cta" href="https://github.com/AHDMarwan/pqc_analysis">GitHub ↗</a></div></nav>
+<header>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#top">PQC Analysis</a>
+      <div class="links"><a href="#scope">Scope</a><a href="#usage">Usage</a><a href="#topology">Topology</a><a href="#install">Install</a><a href="https://github.com/AHDMarwan/pqc_analysis">GitHub</a></div>
+    </nav>
+    <div class="intro" id="top">
+      <h1>PQC Analysis</h1>
+      <p class="lead">A Python toolkit for studying parameterized quantum circuits. It provides geometric, trainability, resource, benchmarking, and experimental topological analyses that can be used alongside existing quantum programming frameworks.</p>
+      <div class="meta"><span>Version 0.2</span><span>Python 3.11+</span><span>MIT License</span><span>PennyLane support</span><span>Optional Qiskit and TDA integrations</span></div>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section id="scope">
+    <h2>Scope</h2>
+    <p class="muted">The package is intended for measuring and comparing properties of variational quantum circuits. It is not a circuit framework or simulator.</p>
+    <div class="grid">
+      <div class="item"><h3>Quantum geometry</h3><p>Fubini–Study metric tensors, spectra, rank, conditioning, effective dimension, and local parameter redundancy.</p></div>
+      <div class="item"><h3>Trainability</h3><p>Gradient statistics, per-parameter and layer-wise profiles, near-zero fractions, and scaling across system sizes.</p></div>
+      <div class="item"><h3>Redundancy analysis</h3><p>Metric null-space analysis and conservative ranking of parameters associated with locally redundant directions.</p></div>
+      <div class="item"><h3>Resource estimates</h3><p>Approximate circuit-evaluation and shot counts for parameter-shift, SPSA, and finite-difference protocols.</p></div>
+      <div class="item"><h3>Benchmarking</h3><p>Evaluation of multiple circuit architectures under common seeds and settings, with flat records for later analysis.</p></div>
+      <div class="item"><h3>Framework adapters</h3><p>PennyLane is supported directly; Qiskit is available as an optional integration.</p></div>
+    </div>
+  </section>
+  <section id="usage">
+    <h2>Basic use</h2>
+<pre><code>import pqc_analysis as pqa
 
-<header class="hero" id="top"><div class="wrap hero-grid"><div><div class="eyebrow">v0.2 · Research toolkit · MIT</div><h1>Understand whether your quantum model is <span class="gradient">actually trainable.</span></h1><p class="lead">PQC Analysis is an analysis layer for parameterized quantum circuits: quantum geometry, gradient trainability, barren-plateau scaling, redundancy-aware pruning, reproducible benchmarking, resource accounting and topology diagnostics.</p><div class="actions"><a class="btn primary" href="#install">Get started</a><a class="btn" href="https://github.com/AHDMarwan/pqc_analysis">View source</a><a class="btn" href="https://github.com/AHDMarwan/pqc_analysis/blob/main/CITATION.cff">Cite the software</a></div><div class="meta"><span><strong>PennyLane</strong> native</span><span><strong>Qiskit</strong> optional</span><span><strong>Python 3.11+</strong></span><span><strong>Backend-aware</strong> diagnostics</span></div></div>
-<div class="quantum-card" aria-label="stylized quantum circuit diagnostic"><div class="eyebrow">trainability report</div><div class="circuit"><div class="wire"><span class="q">q0</span><span class="gate g1">RY</span><span class="gate g2">CZ</span><span class="gate g3">RZ</span></div><div class="wire"><span class="q">q1</span><span class="gate g1">RX</span><span class="gate g2">●</span><span class="gate g3">RY</span></div><div class="wire"><span class="q">q2</span><span class="gate g1">RZ</span><span class="gate g2">CZ</span><span class="gate g3">RX</span></div></div><div class="metric-box">metric_rank <b>24 / 32</b><br>condition_score <b>3.2e-03</b><br>gradient_variance <b>8.1e-06</b><br>redundant_directions <b>8</b><div class="spark"><i style="height:86%"></i><i style="height:62%"></i><i style="height:51%"></i><i style="height:42%"></i><i style="height:27%"></i><i style="height:18%"></i><i style="height:11%"></i><i style="height:6%"></i></div></div></div></div></header>
-
-<section id="features"><div class="wrap"><div class="section-head"><div class="kicker">Core capabilities</div><h2>Diagnostics built for QML research, not just circuit execution.</h2><p>The package focuses on the failure modes researchers repeatedly need to measure, compare and report.</p></div><div class="grid">
-<div class="card"><div class="icon">G</div><h3>Quantum geometry</h3><p>Fubini–Study metric tensors, spectra, rank, conditioning, effective dimension and redundant parameter directions.</p></div>
-<div class="card"><div class="icon">∇</div><h3>Trainability profiles</h3><p>Global, per-parameter and layer-wise gradient statistics with near-zero fractions and weak-parameter ranking.</p></div>
-<div class="card"><div class="icon">BP</div><h3>Barren-plateau scaling</h3><p>Fit gradient-variance scaling across system sizes instead of labelling one small gradient as a barren plateau.</p></div>
-<div class="card"><div class="icon">P</div><h3>Geometry-aware pruning</h3><p>Use the local metric null space to rank conservative pruning candidates and validate redundancy across samples.</p></div>
-<div class="card"><div class="icon">R</div><h3>Resource accounting</h3><p>Estimate circuit evaluations and shot budgets for parameter-shift, SPSA and finite-difference training protocols.</p></div>
-<div class="card"><div class="icon">B</div><h3>Reproducible benchmarks</h3><p>Compare architectures across common seeds and protocols with flat, CSV-friendly geometry, trainability and cost records.</p></div>
-</div></div></section>
-
-<section id="workflow"><div class="wrap split"><div><div class="section-head"><div class="kicker">One analysis layer</div><h2>Keep your framework. Add diagnostics.</h2><p>PQC Analysis is designed to sit above quantum programming frameworks rather than replace them. The statistical core stays backend-independent while adapters connect PennyLane and Qiskit workflows.</p></div><div class="flow"><div><b>PennyLane</b>QNodes</div><div><b>Qiskit</b>Circuits</div><div><b>PQC Analysis</b>metrics</div><div><b>Benchmarks</b>records</div><div><b>Research</b>evidence</div></div></div>
-<div class="code"><div class="code-head"><span>quickstart.py</span><span class="dots"><span></span><span></span><span></span></span></div><pre><span class="kw">import</span> pennylane <span class="kw">as</span> qml
-<span class="kw">import</span> pqc_analysis <span class="kw">as</span> pqa
-
-<span class="kw">def</span> <span class="fn">circuit</span>(theta):
-    qml.RY(theta[<span class="num">0</span>], wires=<span class="num">0</span>)
-    qml.RY(theta[<span class="num">1</span>], wires=<span class="num">1</span>)
-    qml.CNOT(wires=[<span class="num">0</span>, <span class="num">1</span>])
-    <span class="kw">return</span> qml.state()
-
-report = pqa.<span class="fn">analyze</span>(
+report = pqa.analyze(
     circuit,
-    n_qubits=<span class="num">2</span>,
-    n_params=<span class="num">2</span>,
-    samples=<span class="num">100</span>,
+    n_qubits=6,
+    n_params=24,
+    samples=100,
 )
 
-<span class="fn">print</span>(report.summary())</pre></div></div></section>
-
-<section id="research"><div class="wrap"><div class="section-head"><div class="kicker">Research questions</div><h2>Built around questions that matter in variational quantum algorithms.</h2><p>The project intentionally distinguishes measured evidence from heuristic diagnosis and avoids turning numerical convenience into scientific claims.</p></div><div class="research">
-<div class="card"><h3>Is the ansatz over-parameterized?</h3><p>Inspect Fubini–Study rank, spectrum and null-space participation to identify locally redundant coordinates.</p><span class="tag">geometry</span></div>
-<div class="card"><h3>Where does training become weak?</h3><p>Separate globally small gradients from localized weak layers or specific parameter subsets.</p><span class="tag">trainability</span></div>
-<div class="card"><h3>Is suppression scaling exponentially?</h3><p>Run multi-size gradient-variance scans and report slope and fit quality instead of relying on arbitrary thresholds.</p><span class="tag">barren plateaus</span></div>
-<div class="card"><h3>Which architecture is cheaper under equal budgets?</h3><p>Benchmark geometry and trainability alongside circuit-evaluation and shot costs under a shared protocol.</p><span class="tag">benchmarking</span></div>
-</div></div></section>
-
-<section><div class="wrap"><div class="section-head"><div class="kicker">Advanced analysis</div><h2>From diagnosis to experimentally testable interventions.</h2></div><div class="split"><div class="code"><div class="code-head"><span>advanced.py</span><span>pruning + cost</span></div><pre>profile = pqa.<span class="fn">gradient_profile</span>(
-    gradient_fn,
-    theta_samples,
-    layer_groups={
-        <span class="str">"encoder"</span>: [<span class="num">0</span>, <span class="num">1</span>],
-        <span class="str">"variational"</span>: [<span class="num">2</span>, <span class="num">3</span>],
-    },
-)
-
-plan = pqa.<span class="fn">aggregate_pruning_plan</span>(metrics)
-
-cost = pqa.<span class="fn">estimate_training_resources</span>(
-    n_params=<span class="num">48</span>,
-    steps=<span class="num">200</span>,
-    gradient_method=<span class="str">"parameter-shift"</span>,
-    shots_per_circuit=<span class="num">1000</span>,
-)</pre></div><div><div class="card"><h3>Conservative by design</h3><p>Pruning proposals do not mutate circuits automatically. Candidate removal changes the hypothesis class and should be followed by geometry, trainability and task-level re-evaluation.</p></div><div class="card" style="margin-top:16px"><h3>Transparent resource assumptions</h3><p>Hardware-style evaluation counts are reported where meaningful. Adjoint and backpropagation are not assigned fictitious universal shot counts.</p></div></div></div></div></section>
-
-<section id="install"><div class="wrap install"><div class="install-grid"><div><div class="kicker">Install</div><h2 style="margin:8px 0 10px;font-size:2rem">Start with the lightweight core.</h2><p style="color:var(--muted)">The base package keeps heavy legacy, topology and Qiskit dependencies optional.</p></div><div><div class="command"><span>pip install git+https://github.com/AHDMarwan/pqc_analysis.git</span><button onclick="navigator.clipboard.writeText('pip install git+https://github.com/AHDMarwan/pqc_analysis.git')">copy</button></div><div class="command" style="margin-top:10px"><span>pip install -e ".[qiskit]"</span><button onclick="navigator.clipboard.writeText('pip install -e &quot;.[qiskit]&quot;')">copy</button></div><div class="command" style="margin-top:10px"><span>pip install -e ".[tda]"</span><button onclick="navigator.clipboard.writeText('pip install -e &quot;.[tda]&quot;')">copy</button></div></div></div></div></section>
-
-<footer><div class="wrap footer-grid"><div><strong style="color:#d9e6f1">PQC Analysis</strong><br><span>Research software by Marwan AIT HADDOU · MIT License</span></div><div class="footer-links"><a href="https://github.com/AHDMarwan/pqc_analysis">GitHub</a><a href="https://github.com/AHDMarwan/pqc_analysis/blob/main/README.md">Docs</a><a href="https://github.com/AHDMarwan/pqc_analysis/blob/main/CITATION.cff">Citation</a><a href="https://github.com/AHDMarwan/pqc_analysis/issues">Issues</a></div></div></footer>
+print(report.summary())</code></pre>
+    <p class="muted">Individual modules can be used directly when only one type of analysis is needed.</p>
+  </section>
+  <section id="topology">
+    <h2>Experimental topology module</h2>
+    <p>The experimental module samples the state space generated by a PQC and applies persistent homology to a pairwise distance matrix. For pure states, the current implementation uses the pure-state form of the Bures distance computed from state overlaps.</p>
+    <p>Current experiments compare persistence summaries with geometric and trainability quantities across ansatz families, qubit counts, depths, and local or global observables.</p>
+    <div class="note">This part of the package is experimental. Correlations with trainability metrics are treated as exploratory results and are not presented as established predictors.</div>
+  </section>
+  <section>
+    <h2>Benchmark experiments</h2>
+    <p>The repository includes a manual GitHub Actions workflow for pilot and full topology/geometry/trainability studies. Results are exported as CSV and JSON artifacts.</p>
+<pre><code>python scripts/run_topology_matrix.py \
+  --profile pilot \
+  --output artifacts/topology_matrix</code></pre>
+  </section>
+  <section id="install">
+    <h2>Installation</h2>
+<pre><code>git clone https://github.com/AHDMarwan/pqc_analysis.git
+cd pqc_analysis
+pip install -e .</code></pre>
+    <p>Optional integrations:</p>
+<pre><code>pip install -e ".[qiskit]"
+pip install -e ".[tda]"
+pip install -e ".[all]"</code></pre>
+  </section>
+  <section>
+    <h2>Project status</h2>
+    <p>The core geometry, gradient, benchmarking, and resource modules have automated tests. The topology module is maintained separately as an experimental research component.</p>
+    <p>Source code, tests, examples, research notes, and citation metadata are available in the <a href="https://github.com/AHDMarwan/pqc_analysis">repository</a>.</p>
+  </section>
+</main>
+<footer><div class="wrap">PQC Analysis · MIT License · <a href="https://github.com/AHDMarwan/pqc_analysis/blob/main/CITATION.cff">Citation</a> · <a href="https://github.com/AHDMarwan/pqc_analysis/issues">Issues</a></div></footer>
 </body>
 </html>
